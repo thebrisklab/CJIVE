@@ -401,8 +401,8 @@ perm.jntrank <- function(dat.blocks, signal.ranks = NULL, nperms = 500, perc.var
 ###########       Chordal norm for matrices with diff ranks         ##################
 ######################################################################################
 chord.norm.diff = function(X,Y, tol = 1E-8){
-  svd.X = svd(scale(X))
-  svd.Y = svd(scale(Y))
+  svd.X = svd(X)
+  svd.Y = svd(Y)
   if(svd.Y$d[1]>0){
     Uy = svd.Y$u
   } else {
