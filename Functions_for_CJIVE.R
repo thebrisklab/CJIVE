@@ -3,9 +3,9 @@
 #######                 Author: Raphiel J. Murden                                      ####################################
 #######                 Supervised by Benjamin Risk                                    ####################################
 ###########################################################################################################################
-library(rootSolve); library(Matrix); library(ggplot2); library(reshape2); library(fields); library(mvtnorm)
-library(dplyr); library(xtable); library(optimx); library(gplots); library(MASS); library(r.jive); 
-library(extraDistr)
+require(rootSolve); require(Matrix); require(ggplot2); require(reshape2); require(fields); require(mvtnorm)
+require(dplyr); require(xtable); require(optimx); require(gplots); require(MASS); require(r.jive); 
+require(extraDistr)
 
 ######################################################################################################################
 ###########   Generates 2 Simulated Datasets that follow JIVE Model using binary subject scores   ####################
@@ -110,162 +110,6 @@ GenToyDatBinRank <- function(n, p1, p2, JntVarEx1, JntVarEx2, IndVarEx1, IndVarE
   out
 }
 
-######################################################################################################################
-###########   Generates 2 Simulated Datasets that follow JIVE Model using binary subject scores   ####################
-######################################################################################################################
-GenerateToyDat <- function(n, p1, p2, JntVarEx1, JntVarEx2, IndVarEx1, IndVarEx2, jnt_rank = 1, equal.eig = F,
-                             ind_rank1 = 2, ind_rank2 = 2, JntVarAdj = T, SVD.plots = T, Error = T, print.cor = T,
-                             Loads = "Double_Exp", Scores = "Gaussian_Mixture"){
-  
-  #Write out both joint and indiv subject scores for both data sets first
-  r.J = jnt_rank
-  r.I1 = ind_rank1
-  r.I2 = ind_rank2
-  
-  print(paste("Generating loadings from ", Loads, "and Scores from", Scores))
-  
-  if(Scores=="Binomial"){
-    JntScores = matrix(rbinom(n*r.J, size=1, prob=0.2), nrow = n, ncol = r.J)
-    
-    b = rbinom(n*(r.I1 + r.I2), size=1, prob=0.4)
-    b = 1 - 2*b
-    IndivScores = matrix(b, nrow = n, ncol = (r.I1 + r.I2))
-  } else if (Scores=="Gaussian_Mixture"){
-    mix.probs = c(0.2, 0.5, 0.3)
-    JointScores.g1 = matrix(rnorm(n*mix.probs[1]*r.J), ncol = r.J)
-    JointScores.g2 = matrix(rnorm(n*mix.probs[2]*r.J, -4, 1), ncol = r.J)
-    JointScores.g3 = matrix(rnorm(n*mix.probs[3]*r.J, 4, 1), ncol = r.J)
-    JntScores = rbind(JointScores.g1, JointScores.g2, JointScores.g3)
-    
-    IndivScores = matrix(rnorm(n*(r.I1+r.I2)), nrow = n, ncol = (r.I1 + r.I2))
-  }
-  
-  colnames(JntScores) = paste("Jnt Score", 1:r.J)
-  colnames(IndivScores) = c(paste("Ind X Score", 1:r.I1), paste("Ind Y Score", 1:r.I2))
-  
-  if(print.cor){print("The correlation between subject scores is given by"); print(round(cor(cbind(JntScores, IndivScores)),4))}
-  
-  ##############################Define X Dataset##############################
-  if(Loads == "Gaussian"){
-    AdjJntLoad.X = matrix(rnorm(r.J*p1), nrow = r.J, ncol = p1)
-  } else if (Loads == "Fixed"){
-    temp.fcn = function(x){x[sample(round(length(x)/2))] = 1; x}
-    AdjJntLoad.X = matrix(apply(matrix(0, nrow = r.J, ncol = p1), 1, temp.fcn), nrow = r.J)
-  } else if (Loads == "Double_Exp"){
-    AdjLoad.X = matrix(extraDistr::rlaplace(p1*(r.J+r.I1)), nrow = r.J+r.I1)
-    AdjJntLoad.X = AdjLoad.X[1:r.J, , drop = FALSE]
-  } else if (Loads == "Rademacher"){
-    AdjLoad.X = matrix(extraDistr::rsign(p1*r.J), nrow = r.J)
-    AdjJntLoad.X = AdjLoad.X[1:r.J, , drop = FALSE]
-  } 
-  
-  #change relavent scaling of joint components
-  D.J = (equal.eig + 1)*diag(r.J:1) + equal.eig*diag(rep(1,r.J))
-  JX = JntScores%*%sqrt(D.J)%*%AdjJntLoad.X
-  
-  if(SVD.plots){
-    plot(svd(JX)$d, ylab = "Singular Values")
-    title("SVD of Joint Signal from X")
-  }
-  
-  ##Note that the individual signal has rank = 2 as well
-  IndScores.X = IndivScores[,1:r.I1]
-  IndLoad.X = matrix(rnorm(n = p1*r.I1), nrow = r.I1, ncol = p1)
-  if(Loads == "Gaussian"){
-    IndLoad.X = matrix(rnorm(n = p1*r.I1), nrow = r.I1, ncol = p1)
-  } else if (Loads == "Fixed"){
-    temp.fcn = function(x){x[sample(round(length(x)/4))] = 1; x}
-    IndLoad.X = matrix(apply(matrix(-1, nrow = r.I1, ncol = p1), 1, temp.fcn), nrow = r.I1)
-  } else if (Loads == "Double_Exp"){
-    IndLoad.X = AdjLoad.X[-(1:r.J), , drop = FALSE]
-  } else if (Loads == "Rademacher"){
-    IndLoad.X = AdjLoad.X[-(1:r.J), ,drop = FALSE]
-  } 
-  D.IX = (equal.eig + 1)*diag((r.I1:1)) + equal.eig*diag(rep(1,r.I1))
-  
-  IX = IndScores.X%*%sqrt(D.IX)%*%IndLoad.X
-  
-  if(SVD.plots){
-    plot(svd(IX)$d, ylab = "Singular Values")
-    title("SVD of Individual Signal from X")
-  }
-  
-  AX = JX + IX
-  
-  ##############################Define Y Dataset##############################
-  if(Loads == "Gaussian"){
-    AdjJntLoad.Y = matrix(rnorm(r.J*p2), nrow = r.J, ncol = p2)
-  } else if (Loads == "Fixed"){
-    temp.fcn = function(x){x[sample(round(length(x)/2))] = 2; x}
-    AdjJntLoad.Y = matrix(apply(matrix(1, nrow = r.J, ncol = p2), 1, temp.fcn), nrow = r.J)
-  } else if (Loads == "Double_Exp"){
-    AdjLoad.Y = matrix(extraDistr::rlaplace(p2*(r.J+r.I2)), nrow = r.J+r.I2)
-    AdjJntLoad.Y = AdjLoad.Y[1:r.J, , drop = FALSE]
-  } else if (Loads == "Rademacher"){
-    AdjLoad.Y = matrix(extraDistr::rsign(p2*r.J), nrow = r.J)
-    AdjJntLoad.Y = AdjLoad.Y[1:r.J, , drop = FALSE]
-  } 
-  
-  ##Note that the joint signal has rank = 3
-  JY = JntScores%*%sqrt(D.J)%*%AdjJntLoad.Y
-  
-  if(SVD.plots){
-    plot(svd(JY)$d, ylab = "Singular Values")
-    title("SVD of Joint Signal from Y")
-  }
-  
-  IndScores.Y = IndivScores[,(r.I1 + 1:r.I2)]
-  IndLoad.Y = matrix(rnorm(n = p1*r.I1), nrow = r.I1, ncol = p1)
-  if(Loads == "Gaussian"){
-    IndLoad.Y = matrix(rnorm(n = p1*r.I1), nrow = r.I1, ncol = p1)
-  } else if (Loads == "Fixed"){
-    temp.fcn = function(x){x[sample(round(length(x)/4))] = 1; x}
-    IndLoad.Y = matrix(apply(matrix(-1, nrow = r.I2, ncol = p2), 1, temp.fcn), nrow = r.I2)
-  } else if (Loads == "Double_Exp"){
-    IndLoad.Y = AdjLoad.Y[-(1:r.J), , drop = FALSE]
-  } else if (Loads == "Rademacher"){
-    IndLoad.Y = AdjLoad.Y[-(1:r.J), ,drop = FALSE]
-  } 
-  D.IY = (equal.eig + 1)*diag((r.I2:1)) + equal.eig*diag(rep(1,r.I2)) 
-  
-  ##Note that the individual signal has rank=2
-  IY = IndScores.Y%*%sqrt(D.IY)%*%IndLoad.Y
-  
-  if(SVD.plots){
-    plot(svd(IY)$d, ylab = "Singular Values")
-    title("SVD of Individual Signal from Y")
-  }
-  
-  ##Error matrix
-  EX = matrix(rnorm(n*p1), nrow=n, ncol=p1)*Error
-  
-  ##Error matrix
-  EY = matrix(rnorm(n*p2), nrow=n, ncol=p2)*Error
-  
-  Dat.X = AdjSigVarExp(JX, IX, EX, JntVarEx1, IndVarEx1)
-  JX = Dat.X$J
-  IX = Dat.X$I
-  
-  Dat.Y = AdjSigVarExp(JY, IY, EY, JntVarEx2, IndVarEx2)
-  JY = Dat.Y$J
-  IY = Dat.Y$I
-  
-  Blocks = list(Dat.X[["Data"]], Dat.Y[["Data"]])
-  
-  Dat.Comps = list(JX, JY, IX, IY, EX, EY)
-  names(Dat.Comps) = c("J1", "J2", "I1", "I2", "E1", "E2" )
-  
-  Scores = list(JntScores, IndScores.X, IndScores.Y)
-  names(Scores) = c("Joint", "Indiv_1", "Indiv_2")
-  
-  Loadings = list(AdjJntLoad.X, IndLoad.X, AdjJntLoad.Y, IndLoad.Y)
-  names(Loadings) = c("Joint_1", "Indiv_1", "Joint_2", "Indiv_2")
-  
-  out = list(Dat.Comps, Blocks, Scores, Loadings)
-  names(out) = c("Data Components", "Data Blocks", "Scores", "Loadings")
-  
-  out
-}
 
 ####################################################################################
 ###########   Adjust Dataset Components to get Desired R^2 Values  #################
@@ -350,6 +194,7 @@ perm.jntrank <- function(dat.blocks, signal.ranks = NULL, nperms = 500, perc.var
   if(n.r.1 != n.r.2){stop("The number of rows in each data matrix must match")}
   n = n.r.1
   
+  K = length(dat.blocks)
   ##Column center data blocks
   if(center){
     cent.blocks = lapply(dat.blocks, function(D){scale(D, scale = F)})
@@ -358,28 +203,27 @@ perm.jntrank <- function(dat.blocks, signal.ranks = NULL, nperms = 500, perc.var
   }
   
   if(is.null(signal.ranks)){
-    d1 = svd(cent.blocks[[1]])$d^2
-    d2 = svd(cent.blocks[[2]])$d^2
-    
-    r.1 = which.min(cumsum(d1) <= perc.var*sum(d1)) 
-    r.2 = which.min(cumsum(d2) <= perc.var*sum(d2))
-    
-    signal.ranks = c(r.1,r.2)
+    all.singvals = sapply(cent.blocks, function(x) svd(x$d))
+    for(k in 1:K){
+      d = all.singvals
+      signal.ranks = c(signal.ranks, which.min(cumsum(d^2) <= perc.var*sum(d^2)) )
+    }
   }
   
-  x1.svd = svd(cent.blocks[[1]], nu = signal.ranks[1], nv = signal.ranks[1])
-  x2.svd = svd(cent.blocks[[2]], nu = signal.ranks[2], nv = signal.ranks[2])
-  
-  U.1 = scale(x1.svd$u, scale = F)
-  U.2 = scale(x2.svd$u, scale = F)
-  
-  U1tU2 = t(U.1)%*%U.2
+  x.all.svd = list()
+  for(k in 1:K){
+    x.all.svd[[k]] = svd(cent.blocks[[k]], nu = signal.ranks[k], nv = signal.ranks[k])
+  }
+
+  U.all = lapply(x.all.svd, function(x) scale(x$u, scale = FALSE))
+
+  U1tU2 = t(U.all[[1]])%*%U.all[[2]]
   orig.corrs = svd(U1tU2)$d
   
   perm.corrs = NULL
   
   for (i in 1:nperms){
-    U1tU2.perm = t(U.1)%*%U.2[sample(n),]
+    U1tU2.perm = t(U.all[[1]])%*%U.all[[2]][sample(n),]
     perm.svd = svd(U1tU2.perm)
     perm.corrs = rbind(perm.corrs, perm.svd$d)
   }
@@ -478,7 +322,7 @@ cc.jive<-function(dat.blocks, signal.ranks = NULL, joint.rank = 1, perc.var = 0.
     U1tU2.svd = svd(U1tU2)
     orig.corrs = U1tU2.svd$d
   }
-  sjive.out = sjive(cent.blocks, c(r.1, r.2), r.J)
+  sjive.out = sjive(cent.blocks, c(r.1, r.2), r.J, jnt.scores)
     
   if(perm.test){
     res = list(r.J, jnt.scores, list(orig.corrs,cca.perm.res$'P-values'), list(U1tU2.svd$u, U1tU2.svd$v), signal.ranks)
@@ -516,7 +360,7 @@ cc.jive.pred<-function(orig.dat.blocks, new.subjs, joint.rank = 1, tot.signal.ra
 #####################################################################################p########################
 ##############            Retrieve Simulation Results stored in a directory                ##################
 #############################################################################################################
-GetSimResults_Dir = function(sim.dir, p1, p2){
+GetSimResults_Dir = function(sim.dir, p1, p2, Preds=FALSE){
 #  setwd(sim.dir)
   files = list.files(sim.dir, pattern = ".csv")
   num_sims = length(files)
@@ -528,10 +372,16 @@ GetSimResults_Dir = function(sim.dir, p1, p2){
   results = NULL
   for (nm in files){
     temp = read.csv(file = file.path(sim.dir, nm), header = T)
-    results = rbind(results,c(temp[,2], p1, p2))
+    varnames = temp[,1]; values = temp[,2]
+    to.keep = !grepl("Pred",varnames)
+    if(Preds==F & length(to.keep)>0){
+      values = values[to.keep]
+      varnames = varnames[to.keep]
+      }
+    results = rbind(results,c(values, p1, p2))
   }
   
-  colnames(results) = c(temp$X, "p1", "p2")
+  colnames(results) = c(varnames, "p1", "p2")
   
   results = data.frame(cbind(results, JntVarEx1, JntVarEx2))
 }
@@ -658,7 +508,7 @@ sjive<-function (blocks, initial_signal_ranks, joint_rank, joint_scores = NULL)
   indiv_structure <- list()
   joint_structure <- list()
   
-  for (k in 1:K) {
+  for (k in K:1) {
     joint_structure[[k]] = list()
     joint_structure[[k]][['full']]<-joint_proj%*%as.matrix(scaled.centered[[k]])
     temp.svd = svd(joint_structure[[k]][['full']], nu = joint_rank, nv = joint_rank)
@@ -678,7 +528,9 @@ sjive<-function (blocks, initial_signal_ranks, joint_rank, joint_scores = NULL)
     indiv_structure[[k]][['u']] = temp.svd[['u']][,1:indiv.rank, drop = FALSE]
     indiv_structure[[k]][['v']] = temp.svd[['v']][,1:indiv.rank, drop = FALSE]
     indiv_structure[[k]][['d']] = temp.svd[['d']][1:indiv.rank]
-    indiv_structure[[k]][['full']] = indiv_structure[[k]][['u']]%*%diag(indiv_structure[[k]][['d']])%*%t(indiv_structure[[k]][['v']])
+    indiv_structure[[k]][['full']] = indiv_structure[[k]][['u']]%*%
+      diag(indiv_structure[[k]][['d']], nrow = indiv.rank, ncol = indiv.rank)%*%
+      t(indiv_structure[[k]][['v']])
   }
   
   out = list(joint_structure,indiv_structure,stacked_mat,joint_proj)
@@ -725,10 +577,12 @@ ConvSims_gg<-function(AllSims){
   
   Method = sub(".Joint.Rank", "", Method, fixed = T);  Method = sub("aJI", "AJI", Method, fixed = T)
   Method = sub("Correct", "", Method, fixed = T); Method = sub(".Wrong", "-Over", Method, fixed = T)
-  Method = sub("oracle", "Oracle", Method, fixed = T); Method = sub("over", "Over", Method, fixed = T)
+  Method = sub(".oracle", "-Oracle", Method, fixed = T); Method = sub(".over", "-Over", Method, fixed = T)
   Method = sub("Elbow", "Oracle", Method, fixed = T); Method = sub(".95.", "-Over", Method, fixed = T)
   Method = sub("iJI", "R.JI", Method, fixed = T); Method = sub("AJIVE.", "AJIVE-", Method, fixed = T)
-  Method[which(Method == "CC.Oracle")] = "CJIVE-Oracle"; Method[which(Method == "CC-Over")] = "CJIVE-Over"
+  Method = sub("CC", "CJIVE", Method, fixed = T); Method = sub("cJIVE", "CJIVE", Method, fixed = T)
+  Method[which(Method == "CJIVE.Oracle")] = "CJIVE-Oracle"
+  Method[which(Method %in% c("CJIVE.Over", "cJIVE.Over"))] = "CJIVE-Over"
   Method = as.factor(Method)
   
   sim.ranks.gg = data.frame(Rank = Rank, Method = rep(Method, each = num.sims), JVE_1 = rep(JVE_1, each = length(levels(Method))),
@@ -743,12 +597,15 @@ ConvSims_gg<-function(AllSims){
   
   Norm = c(as.numeric(as.matrix(AllSims[,grep("Scores", sim.names)])))
   
-  Method = rep(substr(sim.names[grep("Scores",sim.names)], 1,9), each = num.sims)
-  Method = sub(".Joi", "", Method); Method = sub("E.w.J", "E.w", Method)
-  Method = sub(".Ind", "", Method); Method = sub("E.w.I", "E.w", Method)
+  Method = rep(substr(sim.names[grep("Scores",sim.names)], 1,12), each = num.sims)
+  Method = sub(".Joint.", "", Method, fixed = T); Method = sub(".Indiv.", "", Method, fixed = T);
+  # Method = sub(".Joi", "", Method); Method = sub("E.w.J", "E.w", Method)
+  # Method = sub(".Ind", "", Method); Method = sub("E.w.I", "E.w", Method)
   Method = sub("aJI", "AJI", Method, fixed = T); Method = sub("iJI", "R.JI", Method, fixed = T);
+  Method = sub("r.J", "r", Method, fixed = T); Method = sub("r.I", "r", Method, fixed = T)
   Method[which(Method == "AJIVE")] = "AJIVE-Oracle"; Method = sub(".w", "-Over", Method, fixed = T); 
   Method[which(Method == "CC.Oracle")] = "CJIVE-Oracle"; Method[which(Method == "CC-Over")] = "CJIVE-Over"
+  Method = sub("JIVE.", "JIVE-", Method, fixed = T); Method = sub("[[:punct:]]$", "", Method, fixed = T)
   Method = as.factor(Method)
   
   Type = rep(substring(sim.names[grep("Scores", sim.names)], 7), each = num.sims)
@@ -757,6 +614,8 @@ ConvSims_gg<-function(AllSims){
   Type = gsub("X", "X[1]", Type)
   Type = gsub("Y", "X[2]", Type)
   Type = gsub("cle ", "", Type)
+  Type = gsub("Over ", "", Type)
+  Type = gsub("Ora", "", Type)
   Type = factor(Type)
   
   n.levs = nlevels(Type)*nlevels(Method)
@@ -772,25 +631,26 @@ ConvSims_gg<-function(AllSims){
   
   Norm = c(as.numeric(as.matrix(AllSims[,grep("Loads", sim.names)])))
   
-  Method = rep(substr(sim.names[grep("Loads",sim.names)], 1,9), each = num.sims)
-  Method = sub("Correct", "", Method, fixed = T); Method = sub(".Wrong", "-Over", Method, fixed = T)
-  Method = sub("Elbow", "Oracle", Method, fixed = T); Method = sub(".95.", "-Over", Method, fixed = T)
-  Method = sub(".w.I", "-Over", Method, fixed = T); Method = sub(".w.J", "-Over", Method, fixed = T)
-  # Method = sub("Elbow", "Oracle", Method, fixed = T); Method = sub(".95.", "-Over", Method, fixed = T)
+  Method = rep(substr(sim.names[grep("Loads",sim.names)], 1,12), each = num.sims)
+  Method = sub(".Joint.", "", Method, fixed = T); Method = sub(".Indiv.", "", Method, fixed = T);
+  # Method = sub(".Joi", "", Method); Method = sub("E.w.J", "E.w", Method)
+  # Method = sub(".Ind", "", Method); Method = sub("E.w.I", "E.w", Method)
   Method = sub("aJI", "AJI", Method, fixed = T); Method = sub("iJI", "R.JI", Method, fixed = T);
-  Method[which(Method == "AJIVE.Joi")] = "AJIVE-Oracle"
-  Method[which(Method == "AJIVE.Ind")] = "AJIVE-Oracle"; Method[which(Method == "AJIVE")] = "AJIVE-Oracle"
-  Method = sub(".Joi", "", Method, fixed = T); Method = sub(".Ind", "", Method, fixed = T)
+  Method = sub("r.J", "r", Method, fixed = T); Method = sub("r.I", "r", Method, fixed = T)
+  Method[which(Method == "AJIVE")] = "AJIVE-Oracle"; Method = sub(".w", "-Over", Method, fixed = T); 
   Method[which(Method == "CC.Oracle")] = "CJIVE-Oracle"; Method[which(Method == "CC-Over")] = "CJIVE-Over"
+  Method = sub("JIVE.", "JIVE-", Method, fixed = T); Method = sub("[[:punct:]]$", "", Method, fixed = T)
   Method = as.factor(Method)
   
   Type = factor(rep(substring(sim.names[grep("Loads", sim.names)], 7), each = num.sims))
   Type = sub("w.", "", Type)
-  Type = sub("Loads", "Loadings", Type)
+  Type = gsub("[.]", " ", Type)
   Type = gsub("X", "X[1]", Type)
   Type = gsub("Y", "X[2]", Type)
-  Type = gsub("cle.", "", Type)
-  Type = factor(gsub("[.]", " ", Type))
+  Type = gsub("cle ", "", Type)
+  Type = gsub("Over ", "", Type)
+  Type = gsub("Ora", "", Type)
+  Type = factor(Type)
   
   n.levs = nlevels(Type)*nlevels(Method)
   sim.load.norms.gg = data.frame(Norm = Norm, Method = Method, Type = Type, JVE_1 = rep(JVE_1, each = n.levs), 
@@ -808,77 +668,6 @@ ConvSims_gg<-function(AllSims){
   names(out) = c("Ranks", "Subj and Ldg Norms")
   out
 }
-
-#######################################################################################################################
-#####################   Convert ProJIVE  Simulation Results to a form that will allow ggplot       ####################
-#######################################################################################################################
-ConvSims_gg_ProJIVE<-function(AllSims){
-  sim.names = colnames(AllSims)
-  #CompEvals.names = c(sim.names[grep("Scores", sim.names)], sim.names[grep("Loads", sim.names)])
-  num.sims = dim(AllSims)[1]
-  
-  p1 = unique(AllSims$p1)
-  p2 = unique(AllSims$p2)
-  
-  JVE_1 =  c(as.matrix(AllSims[,grep("JntVarEx1",sim.names)]))
-  JVE1.labs = c(bquote("R"[J1]^2*"=0.05, p"[1]*"="*.(p1)), bquote("R"[J1]^2*"=0.5, p"[1]*"="*.(p1)))
-  JVE_1.raw = factor(JVE_1, labels = JVE1.labs, levels = c(0.05, 0.5))
-  
-  JVE_2 = c(as.matrix(AllSims[,grep("JntVarEx2",sim.names)]))
-  JVE2.labs = c(bquote("R"[J2]^2*"=0.05, p"[2]*"="*.(p2)), bquote("R"[J2]^2*"=0.5, p"[2]*"="*.(p2)) )
-  JVE_2.raw = factor(JVE_2, labels = JVE2.labs, levels = c(0.05, 0.5))
-  
-  IVE_1 = c(as.matrix(AllSims[,grep("Indiv.Var.Exp.X", sim.names)]))
-  IVE_1 = round(as.numeric(IVE_1), 2)
-  
-  IVE_2 = c(as.matrix(AllSims[,grep("Indiv.Var.Exp.Y", sim.names)]))
-  IVE_2 = round(as.numeric(IVE_2), 2)
-  
-  Norm = c(as.numeric(as.matrix(AllSims[,grep("Scores", sim.names)])))
-  
-  Method = substr(sim.names[grep("Scores",sim.names)], 1,7)
-  Method = sub("E.O", "E", Method); Method = sub("E.", "E", Method)
-  Method = rep(as.factor(Method), each = num.sims)
-  
-  Type = substring(sim.names[grep("Scores", sim.names)], 8)
-  Type = sub("racle.", "", Type); Type = sub(".J", "J", Type); Type = sub(".I", "I", Type);
-  Type = gsub("[.]", " ", Type)
-  Type = gsub("X", "X[1]", Type)
-  Type = gsub("Y", "X[2]", Type)
-  Type = gsub("cle ", "", Type)
-  Type = rep(as.factor(Type), each = num.sims)
-  
-  n.levs = nlevels(Type)*nlevels(Method)
-  sim.score.norms.gg = data.frame(Norm = Norm, Method = Method, Type = Type, JVE_1 = rep(JVE_1.raw, each = n.levs), 
-                                  JVE_2 = rep(JVE_2.raw, each = n.levs),
-                                  IVE_1 = rep(IVE_1, each = n.levs), IVE_2 = rep(IVE_2, each = n.levs))
-  
-  Norm = c(as.numeric(as.matrix(AllSims[,grep("Loads", sim.names)])))
-  
-  Method = rep(substr(sim.names[grep("Loads",sim.names)], 1,7), each = num.sims)
-  Method = sub("E.O", "E", Method); Method = sub("E.", "E", Method)
-  Method = as.factor(Method)
-  
-  Type = rep(substring(sim.names[grep("Loads", sim.names)], 7), num.sims)
-  Type = sub("Oracle.", "", Type); Type = sub("E.", "", Type)
-  Type = sub(".I", "I", Type);  Type = sub(".J", "J", Type);
-  Type = sub("Loads", "Loadings", Type)
-  Type = gsub("X", "X[1]", Type)
-  Type = gsub("Y", "X[2]", Type)
-  Type = as.factor(gsub("[.]", " ", Type))
-  
-  n.levs = nlevels(Type)*nlevels(Method)
-  JVE_1 = rep(JVE_1.raw, each = n.levs)
-  JVE_2 = rep(JVE_2.raw, each = n.levs)
-  
-  sim.load.norms.gg = data.frame(Norm = Norm, Method = Method, Type = Type, JVE_1 = JVE_1, JVE_2 = JVE_2, 
-                                 IVE_1 = rep(IVE_1, each = n.levs), IVE_2 = rep(IVE_2, each = n.levs))
-
-  sim.all.norms.gg = rbind(sim.score.norms.gg, sim.load.norms.gg)
-  out = sim.all.norms.gg 
-  out
-}
-
 
 
 ##############Author: Ben Risk, PhD
@@ -899,6 +688,10 @@ create.graph.long = function(gmatrix,sort_indices=NULL) {
 #####################         Plot CJIVE Norms from Simulation Study      #######################
 #################################################################################################
 gg.norm.plot<-function(norm.dat, cols, show.legend = F, text.size, lty = 1, y.max = 1){
+  labs = levels(norm.dat$Type)[c(3,6,7,1,2,4,5)]
+  labs.ex = c("Joint Subj Scores", expression("Joint Loadings"*"X"[1]), expression("Joint Loadings"*"X"[2]), 
+              expression("Indiv Subj Scores"*"X"[1]), expression("Indiv Subj Scores"*"X"[2]),
+              expression("Indiv Loadings"*"X"[1]), expression("Indiv Loadings"*"X"[2]))
   ggplot(data = norm.dat, aes(x = Type, y = Norm)) +
     geom_boxplot(aes(fill = Method), position = "dodge", outlier.alpha = 0, show.legend = show.legend, linetype = lty,
                  fatten = 0.5) +
@@ -907,7 +700,52 @@ gg.norm.plot<-function(norm.dat, cols, show.legend = F, text.size, lty = 1, y.ma
     #              show.legend = F) +
     labs(y = "Chordal Norm", x = "Type") +
     facet_grid(JVE_2 ~ JVE_1, labeller = label_parsed) +
-    scale_x_discrete(limits = levels(sim.all.norms.gg$Type)[c(3,6,7,1,2,4,5)], labels = labs.ex) +
+    scale_x_discrete(limits = levels(norm.dat$Type)[c(3,6,7,1,2,4,5)], labels = labs.ex) +
+    scale_fill_manual(values=cols) +
+    scale_colour_manual(values=cols) + 
+    theme_bw() + coord_cartesian(ylim = c(0, y.max)) + 
+    theme(axis.title.x = element_blank(), axis.text.x = element_text(face = "bold", hjust = 01, angle = 70, size = text.size-3),
+          text = element_text(size = text.size))
+}
+
+#################################################################################################
+#####################         Plot CJIVE Norms from Simulation Study      #######################
+#################################################################################################
+gg.score.norm.plot<-function(norm.dat, cols, show.legend = F, text.size, lty = 1, y.max = 1){
+  labs = levels(norm.dat$Type)[grep("Score",levels(norm.dat$Type))][c(3,1,2)]
+  labs.ex = c("Joint Subj Scores", expression("Indiv Subj Scores"*"X"[1]), expression("Indiv Subj Scores"*"X"[2]))
+  ggplot(data = norm.dat, aes(x = Type, y = Norm)) +
+    geom_boxplot(aes(fill = Method), position = "dodge", outlier.alpha = 0, show.legend = show.legend, linetype = lty,
+                 fatten = 0.5) +
+    # geom_boxplot(aes(color = Method),
+    #              fatten = NULL, fill = NA, coef = 0, outlier.alpha = 0,
+    #              show.legend = F) +
+    labs(y = "Chordal Norm", x = "Type") +
+    facet_grid(JVE_2 ~ JVE_1, labeller = label_parsed) +
+    scale_x_discrete(limits = labs, labels = labs.ex) +
+    scale_fill_manual(values=cols) +
+    scale_colour_manual(values=cols) + 
+    theme_bw() + coord_cartesian(ylim = c(0, y.max)) + 
+    theme(axis.title.x = element_blank(), axis.text.x = element_text(face = "bold", hjust = 01, angle = 70, size = text.size-3),
+          text = element_text(size = text.size))
+}
+
+#################################################################################################
+#####################         Plot CJIVE Norms from Simulation Study      #######################
+#################################################################################################
+gg.load.norm.plot<-function(norm.dat, cols, show.legend = F, text.size, lty = 1, y.max = 1){
+  labs = levels(norm.dat$Type)[grep("Load",levels(norm.dat$Type))][c(3,4,1,2)]
+  labs.ex = c(expression("Joint Variable Loadings"*"X"[1]),expression("Joint Variable Loadings"*"X"[2]),
+              expression("Indiv Variable Loadings"*"X"[1]), expression("Indiv Variable Loadings"*"X"[2]))
+  ggplot(data = norm.dat, aes(x = Type, y = Norm)) +
+    geom_boxplot(aes(fill = Method), position = "dodge", outlier.alpha = 0, show.legend = show.legend, linetype = lty,
+                 fatten = 0.5) +
+    # geom_boxplot(aes(color = Method),
+    #              fatten = NULL, fill = NA, coef = 0, outlier.alpha = 0,
+    #              show.legend = F) +
+    labs(y = "Chordal Norm", x = "Type") +
+    facet_grid(JVE_2 ~ JVE_1, labeller = label_parsed) +
+    scale_x_discrete(limits = labs, labels = labs.ex) +
     scale_fill_manual(values=cols) +
     scale_colour_manual(values=cols) + 
     theme_bw() + coord_cartesian(ylim = c(0, y.max)) + 
@@ -932,4 +770,59 @@ gg.corr.plot<-function(cor.dat, cols, show.legend = F, text.size){
     theme(text = element_text(size = text.size))
 }
 
+#################################################################################################
+#####################         Plot Ranks CJIVE from Simulation Study      #######################
+#################################################################################################
+gg.rank.plot<-function(rank.dat, cols, show.legend = F, text.size){
+  ggplot(data = rank.dat, aes(x = Rank, y = n/nrow(AllSims), fill=Method)) +
+    geom_bar(position = position_dodge(), stat = "identity", width = 0.6, show.legend = show.legend) +
+    labs(y = "Proportion", x = "Selected Rank") +
+    facet_grid(JVE_2 ~ JVE_1, labeller = label_parsed) +
+    scale_fill_manual(values=cols) + 
+    theme_bw() + 
+    theme(text = element_text(size = text.size))
+}
 
+############################################################c#####################################
+##############   Box-plots of chordal norms from CJIVE from Simulation Study      ################
+##################################################################################################
+Melt.Sim.Cors<-function(sim.dat,r.J,p1,p2){
+  JVE1.labs = c(bquote("R"[J1]^2*"=0.05, p"[1]*"="*.(p1)), bquote("R"[J1]^2*"=0.5, p"[1]*"="*.(p1)))
+  JVE2.labs = c(bquote("R"[J2]^2*"=0.05, p"[2]*"="*.(p2)), bquote("R"[J2]^2*"=0.5, p"[1]*"="*.(p2)))
+  
+  A.PredCors.melt = melt(sim.dat, id.vars = c("JntVarEx1", "JntVarEx2"), 
+                         measure.vars = paste("AJIVE_Pred_Corr", 1:r.J, sep = ""), variable_name = "Component")
+  colnames(A.PredCors.melt)[which(colnames(A.PredCors.melt)=="variable")]="Component"
+  colnames(A.PredCors.melt)[which(colnames(A.PredCors.melt)=="value")]="Prediction_Correlation"
+  
+  levels(A.PredCors.melt$Component) = paste("No.", 1:r.J)
+  A.PredCors.melt$Type = "AJIVE"
+  
+  CC.PredCors.melt = melt(sim.dat, id.vars = c("JntVarEx1", "JntVarEx2"), 
+                          measure.vars = paste("CC_Pred_Corr", 1:r.J, sep = ""), variable_name = "Component", 
+                          value.name = "Prediction_Correlation")
+  colnames(CC.PredCors.melt)[which(colnames(CC.PredCors.melt)=="variable")]="Component"
+  colnames(CC.PredCors.melt)[which(colnames(CC.PredCors.melt)=="value")]="Prediction_Correlation"
+  
+  levels(CC.PredCors.melt$Component) = paste("No.", 1:r.J)
+  CC.PredCors.melt$Type = "CJIVE"
+  
+  Pred.Cors.melt = rbind(A.PredCors.melt, CC.PredCors.melt)
+  Pred.Cors.melt$Prediction_Correlation = abs(Pred.Cors.melt$Prediction_Correlation)
+  Pred.Cors.melt$JVE_1 = factor(Pred.Cors.melt$JntVarEx1, labels = JVE1.labs)
+  Pred.Cors.melt$JVE_2 = factor(Pred.Cors.melt$JntVarEx2, labels = JVE2.labs)
+  Pred.Cors.melt
+}
+
+############################################################c#####################################
+##############         Function to sign-correct and scale variable loadings       ################
+##################################################################################################
+scale.loadings = function(loading.comp){
+  x = loading.comp
+  x1 = x/max(abs(x), na.rm = TRUE)
+  # x2 = x/max(x, na.rm = TRUE)
+  # pos = max(x1, na.rm = TRUE)==max(x2, na.rm = TRUE)
+  # ((-1)^(pos))*x1
+  pos = sign(skew(x1, na.rm = TRUE))
+  ((-1)^(pos))*x1
+}
