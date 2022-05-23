@@ -1,6 +1,11 @@
 test_that("MatVar works", {
   X = matrix(rnorm(9),3,3)
-  expect_equal(MatVar2(X), sum(diag(X%*%t(X))))
+  expect_equal(MatVar(X), sqrt(sum(diag(t(X)%*%X))))
+})
+
+test_that("MatVar2 works", {
+  X = matrix(rnorm(9),3,3)
+  expect_equal(MatVar2(X), sqrt(sum(X^2)))
 })
 
 

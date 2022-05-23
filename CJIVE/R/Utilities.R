@@ -5,7 +5,25 @@
 #'
 #' @param X a matrix of any size
 #'
-#' @return The Frobenius norm of the matrix X, calculated as the sum of square entries in X
+#' @return The Frobenius norm of the matrix X, calculated as the square root of the sum of squared entries in X
+#'
+#' @examples
+#' X = matrix(rnorm(10), 5,2)
+#' MatVar(X)
+#' @export
+
+MatVar = function(X){
+  sqrt(sum(X^2))
+}
+
+###########           Frobenius Norm of Data Matrix Values         #################
+#' Alternative calculation - Matrix variation (i.e. Frobenius norm)
+#'
+#' @description Calculates the Frobenius norm of a matrix, which can be used as a measure of total variation
+#'
+#' @param X a matrix of any size
+#'
+#' @return The Frobenius norm of the matrix X, calculated as the square root of the trace of t(X)%*%X
 #'
 #' @examples
 #' X = matrix(rnorm(10), 5,2)
@@ -13,7 +31,7 @@
 #' @export
 
 MatVar2 = function(X){
-sum(X^2)
+  sqrt(sum(diag(t(X)%*%X)))
 }
 
 ###########       Chordal norm for matrices with diff ranks         ##################
