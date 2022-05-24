@@ -13,7 +13,7 @@
 #' @export
 
 MatVar = function(X){
-  sqrt(sum(X^2))
+  sum(X^2)
 }
 
 ###########           Frobenius Norm of Data Matrix Values         #################
@@ -31,7 +31,7 @@ MatVar = function(X){
 #' @export
 
 MatVar2 = function(X){
-  sqrt(sum(diag(t(X)%*%X)))
+  sum(diag(t(X)%*%X))
 }
 
 ###########       Chordal norm for matrices with diff ranks         ##################
