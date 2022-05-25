@@ -320,6 +320,7 @@ ConvSims_gg<-function(AllSims){
   Method[which(Method == "AJIVE")] = "AJIVE-Oracle"; Method = sub(".w", "-Over", Method, fixed = TRUE);
   Method[which(Method == "CC.Oracle")] = "CJIVE-Oracle"; Method[which(Method == "CC-Over")] = "CJIVE-Over"
   Method = sub("JIVE.", "JIVE-", Method, fixed = TRUE); Method = sub("[[:punct:]]$", "", Method, fixed = TRUE)
+  Method = sub("Free ", "", Method, fixed = TRUE)
   Method = as.factor(Method)
 
   Type = rep(substring(sim.names[grep("Scores", sim.names)], 7), each = num.sims)
@@ -327,9 +328,11 @@ ConvSims_gg<-function(AllSims){
   Type = gsub("[.]", " ", Type)
   Type = gsub("X", "X[1]", Type)
   Type = gsub("Y", "X[2]", Type)
-  Type = gsub("cle ", "", Type)
+  Type = gsub("Oracle ", "", Type)
   Type = gsub("Over ", "", Type)
   Type = gsub("Ora", "", Type)
+  Type = sub("Free ", "", Type)
+  Type = sub(" Joint", "Joint", Type); Type = sub(" Indiv", "Indiv", Type)
   Type = factor(Type)
 
   n.levs = nlevels(Type)*nlevels(Method)
@@ -352,16 +355,19 @@ ConvSims_gg<-function(AllSims){
   Method[which(Method == "AJIVE")] = "AJIVE-Oracle"; Method = sub(".w", "-Over", Method, fixed = TRUE);
   Method[which(Method == "CC.Oracle")] = "CJIVE-Oracle"; Method[which(Method == "CC-Over")] = "CJIVE-Over"
   Method = sub("JIVE.", "JIVE-", Method, fixed = TRUE); Method = sub("[[:punct:]]$", "", Method, fixed = TRUE)
+  Method = sub("Free ", "", Method, fixed = TRUE);
   Method = as.factor(Method)
 
   Type = factor(rep(substring(sim.names[grep("Loads", sim.names)], 7), each = num.sims))
-  Type = sub("w.", "", Type)
-  Type = gsub("[.]", " ", Type)
+  Type = sub("w.", "", Type); Type = sub(" Joint", "Joint", Type)
+  Type = gsub("[.]", " ", Type); Type = sub("Indiv", "Indiv", Type)
   Type = gsub("X", "X[1]", Type)
   Type = gsub("Y", "X[2]", Type)
-  Type = gsub("cle ", "", Type)
+  Type = gsub("Oracle ", "", Type)
   Type = gsub("Over ", "", Type)
   Type = gsub("Ora", "", Type)
+  Type = gsub("Free ", "", Type)
+  Type = sub(" Joint", "Joint", Type); Type = sub(" Indiv", "Indiv", Type)
   Type = factor(Type)
 
   n.levs = nlevels(Type)*nlevels(Method)
@@ -404,11 +410,11 @@ gg.norm.plot<-function(norm.dat, cols, show.legend = FALSE, text.size, lty = 1, 
   labs.ex = c("Joint Subj Scores", expression("Joint Loadings"*"X"[1]), expression("Joint Loadings"*"X"[2]),
               expression("Indiv Subj Scores"*"X"[1]), expression("Indiv Subj Scores"*"X"[2]),
               expression("Indiv Loadings"*"X"[1]), expression("Indiv Loadings"*"X"[2]))
-  ggplot2::ggplot(data = norm.dat, ggplot2::aes(x = norm.dat$Type, y = norm.dat$Norm)) +
-    ggplot2::geom_boxplot(ggplot2::aes(fill = norm.dat$Method), position = "dodge", outlier.alpha = 0, show.legend = show.legend, linetype = lty,
+  ggplot2::ggplot(data = norm.dat, ggplot2::aes(x = Type, y = Norm)) +
+    ggplot2::geom_boxplot(ggplot2::aes(fill = Method), position = "dodge", outlier.alpha = 0, show.legend = show.legend, linetype = lty,
                  fatten = 0.5) +
     ggplot2::labs(y = "Chordal Norm", x = "Type") +
-    ggplot2::facet_grid(JVE_2 ~ JVE_1, labeller = ggplot2::label_parsed()) +
+    ggplot2::facet_grid(norm.dat$JVE_2 ~ norm.dat$JVE_1, labeller = ggplot2::label_parsed) +
     ggplot2::scale_x_discrete(limits = levels(norm.dat$Type)[c(3,6,7,1,2,4,5)], labels = labs.ex) +
     ggplot2::scale_fill_manual(values=cols) +
     ggplot2::scale_colour_manual(values=cols) +
@@ -442,7 +448,7 @@ gg.score.norm.plot<-function(norm.dat, cols, show.legend = FALSE, text.size, lty
     ggplot2::geom_boxplot(ggplot2::aes(fill = norm.dat$Method), position = "dodge", outlier.alpha = 0, show.legend = show.legend, linetype = lty,
                  fatten = 0.5) +
     ggplot2::labs(y = "Chordal Norm", x = "Type") +
-    ggplot2::facet_grid(norm.dat$JVE_2 ~ norm.dat$JVE_1, labeller = ggplot2::label_parsed()) +
+    ggplot2::facet_grid(norm.dat$JVE_2 ~ norm.dat$JVE_1, labeller = ggplot2::label_parsed) +
     ggplot2::scale_x_discrete(limits = labs, labels = labs.ex) +
     ggplot2::scale_fill_manual(values=cols) +
     ggplot2::scale_colour_manual(values=cols) +
@@ -477,7 +483,7 @@ gg.load.norm.plot<-function(norm.dat, cols, show.legend = FALSE, text.size, lty 
     ggplot2::geom_boxplot(ggplot2::aes(fill = norm.dat$Method), position = "dodge", outlier.alpha = 0, show.legend = show.legend, linetype = lty,
                  fatten = 0.5) +
     ggplot2::labs(y = "Chordal Norm", x = "Type") +
-    ggplot2::facet_grid(norm.dat$JVE_2 ~ norm.dat$JVE_1, labeller = ggplot2::label_parsed()) +
+    ggplot2::facet_grid(norm.dat$JVE_2 ~ norm.dat$JVE_1, labeller = ggplot2::label_parsed) +
     ggplot2::scale_x_discrete(limits = labs, labels = labs.ex) +
     ggplot2::scale_fill_manual(values=cols) +
     ggplot2::scale_colour_manual(values=cols) +
@@ -507,8 +513,8 @@ gg.corr.plot<-function(cor.dat, cols, show.legend = FALSE, text.size){
     ggplot2::geom_boxplot(ggplot2::aes(fill = cor.dat$Type), position = "dodge", outlier.alpha = 0,
                           show.legend = show.legend, fatten = 0.5) +
     ggplot2::labs(y = "Absolute Pearson Correlation", x = "Component") +
-    ggplot2::facet_grid(cor.dat$JVE_2 ~ cor.dat$JVE_1, labeller = ggplot2::label_parsed()) +
-    ggplot2::scale_fill_manual(values=cols) +
+    ggplot2::facet_grid(cor.dat$JVE_2 ~ cor.dat$JVE_1, labeller = ggplot2::label_parsed) +
+    ggplot2::scale_fill_manual(values=cols, name = "Type") +
     ggplot2::scale_colour_manual(values=cols) +
     ggplot2::theme_bw() +
     ggplot2::theme(text = ggplot2::element_text(size = text.size))
@@ -533,15 +539,30 @@ gg.corr.plot<-function(cor.dat, cols, show.legend = FALSE, text.size){
 #' @return graphical display (via ggplot2)
 #' @export
 gg.rank.plot<-function(rank.dat, cols, show.legend = FALSE, text.size, num.sims){
-  ggplot2::ggplot(data = rank.dat, ggplot2::aes(x = rank.dat$Rank, y = rank.dat$n/num.sims, fill=rank.dat$Method)) +
+  ggplot2::ggplot(data = rank.dat, ggplot2::aes(x = Rank, y = n/num.sims, fill=Method)) +
     ggplot2::geom_bar(position = ggplot2::position_dodge(), stat = "identity", width = 0.6, show.legend = show.legend) +
     ggplot2::labs(y = "Proportion", x = "Selected Rank") +
-    ggplot2::facet_grid(rank.dat$JVE_2 ~ rank.dat$JVE_1, labeller = ggplot2::label_parsed()) +
+    ggplot2::facet_grid(rank.dat$JVE_2 ~ rank.dat$JVE_1, labeller = ggplot2::label_parsed) +
     ggplot2::scale_fill_manual(values=cols) +
     ggplot2::theme_bw() +
     ggplot2::theme(text = ggplot2::element_text(size = text.size))
 }
 
+#####################         'Melts' correlations from prediction portion of simulation study to prepare for plotting       #######################
+#' Converts correlations of predicted to true joint subject scores to a format conducive to ggplot2
+#'
+#' @description Converts correlations of predicted to true joint subject scores into a format conducive to ggplot2
+#'
+#' @param sim.dat matrix with each row representing results from a replicate in the simulation study described in CJIVE manuscript
+#' @param r.J (Numeric/integer) the joint rank, i.e. number of components in the joint subspace
+#' @param p1 number of variables/features in data set X1
+#' @param p2 number of variables/features in data set X2
+#'
+#' @return data frame with seven columns: one each for the joint variance explained in each data set,
+#'         one column containing the method by which predictions were obtained,
+#'         one column containing the component number (1,...,r.J),
+#'
+#' @export
 ##############   Prepare data from prediction portion of simulation study for graphical display      ################
 Melt.Sim.Cors<-function(sim.dat,r.J,p1,p2){
   JVE1.labs = c(bquote("R"[J1]^2*"=0.05, p"[1]*"="*.(p1)), bquote("R"[J1]^2*"=0.5, p"[1]*"="*.(p1)))
@@ -564,7 +585,16 @@ Melt.Sim.Cors<-function(sim.dat,r.J,p1,p2){
   levels(CC.PredCors.melt$Component) = paste("No.", 1:r.J)
   CC.PredCors.melt$Type = "CJIVE"
 
-  Pred.Cors.melt = rbind(A.PredCors.melt, CC.PredCors.melt)
+  R.JIVE.PredCors.melt = reshape2::melt(sim.dat, id.vars = c("JntVarEx1", "JntVarEx2"),
+                                    measure.vars = paste("R.JIVE_Pred_Corr", 1:r.J, sep = ""), variable_name = "Component",
+                                    value.name = "Prediction_Correlation")
+  colnames(R.JIVE.PredCors.melt)[which(colnames(R.JIVE.PredCors.melt)=="variable")]="Component"
+  colnames(R.JIVE.PredCors.melt)[which(colnames(R.JIVE.PredCors.melt)=="value")]="Prediction_Correlation"
+
+  levels(R.JIVE.PredCors.melt$Component) = paste("No.", 1:r.J)
+  R.JIVE.PredCors.melt$Type = "R.JIVE"
+
+  Pred.Cors.melt = rbind(A.PredCors.melt, CC.PredCors.melt, R.JIVE.PredCors.melt)
   Pred.Cors.melt$Prediction_Correlation = abs(Pred.Cors.melt$Prediction_Correlation)
   Pred.Cors.melt$JVE_1 = factor(Pred.Cors.melt$JntVarEx1, labels = JVE1.labs)
   Pred.Cors.melt$JVE_2 = factor(Pred.Cors.melt$JntVarEx2, labels = JVE2.labs)
