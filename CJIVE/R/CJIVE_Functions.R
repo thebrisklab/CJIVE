@@ -260,14 +260,14 @@ cc.jive<-function(dat.blocks, signal.ranks = NULL, joint.rank = 1, perc.var = 0.
 #'
 #' @param orig.dat.blocks list of the two data matrices on which CJIVE was initially conducted
 #' @param new.subjs list of two data matrices containing information on new subjects
-#' @param joint.rank The rank of the joint subspace i.e., number of components in the joint subspace
 #' @param signal.ranks a vector of length two which contains the rank for the signal within each data block. The rank corresponds to the number of principal
 #'                     components (PCs) to be retained within each data block. If NULL, the ranks are determined by the parameter 'perc.var.' Default is NULL
 #' @param cc.jive.loadings canonical loadings for the joint subspace
+#' @param can.cors canonical correlations from the PCs of the data on which CJIVE was initially conducted - notated as rho_j in CJIVE manuscript
 #'
 #' @return matrix of joint subject score for new subjects
 #' @export
-cc.jive.pred<-function(orig.dat.blocks, new.subjs, joint.rank = 1, signal.ranks, cc.jive.loadings){
+cc.jive.pred<-function(orig.dat.blocks, new.subjs, signal.ranks, cc.jive.loadings, can.cors){
 
   r1 = signal.ranks[1]
   r2 = signal.ranks[2]
@@ -279,7 +279,7 @@ cc.jive.pred<-function(orig.dat.blocks, new.subjs, joint.rank = 1, signal.ranks,
 
   Pred.CanVar.1 = new.subjs[[1]]%*%X1.svd$v%*%diag(X1.svd$d[1:r1]^-1)%*%U1.Ldngs
   Pred.CanVar.2 = new.subjs[[2]]%*%X2.svd$v%*%diag(X2.svd$d[1:r2]^-1)%*%U2.Ldngs
-  pred.jnt.scores = sqrt(1/2)*(Pred.CanVar.1 + Pred.CanVar.2)
+  pred.jnt.scores = sqrt(1/2*(1+can.cors))*(Pred.CanVar.1 + Pred.CanVar.2)
 
   return(pred.jnt.scores)
 }

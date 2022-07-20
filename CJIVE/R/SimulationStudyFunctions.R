@@ -453,7 +453,7 @@ gg.norm.plot<-function(norm.dat, cols, show.legend = FALSE, text.size, lty = 1, 
 gg.score.norm.plot<-function(norm.dat, cols, show.legend = FALSE, text.size, lty = 1, y.max = 1, x.lab.angle = 70){
   norm.dat = norm.dat[grep("Score",norm.dat$Type),]
   labs = levels(norm.dat$Type)[grep("Score",levels(norm.dat$Type))][c(3,1,2)]
-  labs.ex = c("Joint Subj Scores", expression("Indiv Subj Scores"*"X"[1]), expression("Indiv Subj Scores"*"X"[2]))
+  labs.ex = c("Joint Scores", expression("Indiv Scores"*" X"[1]), expression("Indiv Scores"*" X"[2]))
   ggplot2::ggplot(data = norm.dat, ggplot2::aes(x = norm.dat$Type, y = norm.dat$Norm)) +
     ggplot2::geom_boxplot(ggplot2::aes(fill = norm.dat$Method), position = "dodge", outlier.alpha = 0, show.legend = show.legend, linetype = lty,
                  fatten = 0.5) +
@@ -489,8 +489,8 @@ gg.score.norm.plot<-function(norm.dat, cols, show.legend = FALSE, text.size, lty
 gg.load.norm.plot<-function(norm.dat, cols, show.legend = FALSE, text.size, lty = 1, y.max = 1, x.lab.angle = 70){
   norm.dat = norm.dat[grep("Load",norm.dat$Type),]
   labs = levels(norm.dat$Type)[grep("Load",levels(norm.dat$Type))][c(3,4,1,2)]
-  labs.ex = c(expression("Joint Variable Loadings"*"X"[1]),expression("Joint Variable Loadings"*"X"[2]),
-              expression("Indiv Variable Loadings"*"X"[1]), expression("Indiv Variable Loadings"*"X"[2]))
+  labs.ex = c(expression("Joint Loadings"*" X"[1]),expression("Joint Loadings"*" X"[2]),
+              expression("Indiv Loadings"*" X"[1]), expression("Indiv Loadings"*" X"[2]))
   ggplot2::ggplot(data = norm.dat, ggplot2::aes(x = norm.dat$Type, y = norm.dat$Norm)) +
     ggplot2::geom_boxplot(ggplot2::aes(fill = norm.dat$Method), position = "dodge", outlier.alpha = 0, show.legend = show.legend, linetype = lty,
                  fatten = 0.5) +
@@ -555,7 +555,7 @@ gg.rank.plot<-function(rank.dat, cols, show.legend = FALSE, text.size, num.sims)
     ggplot2::geom_bar(position = ggplot2::position_dodge(), stat = "identity", width = 0.6, show.legend = show.legend) +
     ggplot2::labs(y = "Proportion", x = "Selected Rank") +
     ggplot2::facet_grid(rank.dat$JVE_2 ~ rank.dat$JVE_1, labeller = ggplot2::label_parsed) +
-    ggplot2::scale_fill_discrete(values=cols,  name = "Method", labels = scales::parse_format) +
+    ggplot2::scale_fill_discrete(values=cols,  name = "Method") +
     ggplot2::theme_bw() +
     ggplot2::theme(text = ggplot2::element_text(size = text.size))
 }

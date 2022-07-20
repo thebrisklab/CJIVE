@@ -7,9 +7,9 @@
 cc.jive.pred(
   orig.dat.blocks,
   new.subjs,
-  joint.rank = 1,
   signal.ranks,
-  cc.jive.loadings
+  cc.jive.loadings,
+  can.cors
 )
 }
 \arguments{
@@ -17,12 +17,12 @@ cc.jive.pred(
 
 \item{new.subjs}{list of two data matrices containing information on new subjects}
 
-\item{joint.rank}{The rank of the joint subspace i.e., number of components in the joint subspace}
-
 \item{signal.ranks}{a vector of length two which contains the rank for the signal within each data block. The rank corresponds to the number of principal
 components (PCs) to be retained within each data block. If NULL, the ranks are determined by the parameter 'perc.var.' Default is NULL}
 
 \item{cc.jive.loadings}{canonical loadings for the joint subspace}
+
+\item{can.cors}{canonical correlations from the PCs of the data on which CJIVE was initially conducted - notated as rho_j in CJIVE manuscript}
 }
 \value{
 matrix of joint subject score for new subjects
