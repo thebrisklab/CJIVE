@@ -360,13 +360,14 @@ sjive<-function (blocks, signal_ranks, joint.rank, joint_scores = NULL)
     if (j>0){
       joint_structure[[k]][['u']]<-temp.svd[['u']]
       joint_structure[[k]][['v']]<-temp.svd[['v']]
+      joint_structure[[k]][['d']]<-temp.svd[['d']][1:joint.rank]
     } else {
-      joint_structure[[k]][['u']]<-matrix(rep(0, nrow(scaled.centered[[k]])), nrow = nrow(scaled.centered[[k]]))
-      joint_structure[[k]][['v']]<-matrix(rep(0, ncol(scaled.centered[[k]])), nrow = ncol(scaled.centered[[k]]))
+      joint_structure[[k]][['u']]<-matrix(rep(0, nrow(scaled.centered[[1]])), ncol = 1)
+      joint_structure[[k]][['v']]<-matrix(rep(0, ncol(scaled.centered[[k]])), ncol = 1)
+      joint_structure[[k]][['d']]<-0
     }
-    joint_structure[[k]][['d']]<-temp.svd[['d']][1:joint.rank]
     joint_structure[[k]][['full']] = joint_structure[[k]][['u']]%*%
-      diag(joint_structure[[k]][['d']], nrow = max(joint.rank,1), ncol = max(joint.rank,1))%*%
+      diag(joint_structure[[k]][['d']], nrow = max(joint.rank, 1), ncol = max(joint.rank, 1))%*%
       t(joint_structure[[k]][['v']])
     joint_structure[[k]][['VarEx']] = sum(joint_structure[[k]][['d']]^2)/total.var[[k]]
 
