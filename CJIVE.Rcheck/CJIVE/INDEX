@@ -1,0 +1,40 @@
+AdjSigVarExp            Adjust Signal Variation Explained
+ConvSims_gg             Convert simulation study results
+GenToyDatBinRank        Generate 'Toy' Data
+GetSimResults_Dir       Retrieve simulation results
+MatVar                  Matrix variation (i.e. Frobenius norm)
+MatVar2                 Alternative calculation - Matrix variation
+                        (i.e. Frobenius norm)
+Melt.Sim.Cors           Converts correlations of predicted to true
+                        joint subject scores to a format conducive to
+                        ggplot2
+cc.jive                 Canonical (Correlation) JIVE
+cc.jive.pred            CJIVE joint subject score prediction
+chord.norm.diff         Chordal norm between column-subspaces of two
+                        matrices
+create.graph.long       Function for plotting networks with ggplot
+gg.corr.plot            Function for plotting Pearson correlations
+                        between predicted and true subject scores
+                        within the simulation study described in CJIVE
+                        manuscript
+gg.load.norm.plot       Function for plotting chordal norms between
+                        estimated and true variable loading subspaces
+                        within the simulation study described in CJIVE
+                        manuscript
+gg.norm.plot            Function for plotting chordal norms between
+                        estimated and true subspaces within the
+                        simulation study described in CJIVE manuscript
+gg.rank.plot            Function for plotting selected joint ranks
+gg.score.norm.plot      Function for plotting chordal norms between
+                        estimated and true subject score subspaces
+                        within the simulation study described in CJIVE
+                        manuscript
+perm.jntrank            Permutation Test for Joint Rank in CJIVE
+scale_loadings          Scale and sign-correct variable loadings to
+                        assist interpretation
+show.image.2            Display a heatmap of a matrix (adapted from
+                        Erick Lock's show.image funciton in the r.jive
+                        package)
+sjive                   Simple JIVE
+vec2net.l               Convert vector to network
+vec2net.u               Convert vector to network

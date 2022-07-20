@@ -337,6 +337,7 @@ ConvSims_gg<-function(AllSims){
   Type = gsub("cle ", "", Type); Type = gsub("Over ", "", Type)
   Type = gsub("Ora", "", Type); Type = gsub("Free ", "", Type)
   Type = gsub(" Joint", "Joint", Type); Type = gsub(" Indiv", "Indiv", Type)
+  Type = gsub(" Subj", "", Type); Type = gsub(" Variable", "", Type)
   Type = as.factor(Type)
 
   n.levs = nlevels(Type)*nlevels(Method)
@@ -371,6 +372,7 @@ ConvSims_gg<-function(AllSims){
   Type = gsub("cle ", "", Type); Type = gsub("Over ", "", Type)
   Type = gsub("Ora", "", Type); Type = gsub("Free ", "", Type)
   Type = gsub(" Joint", "Joint", Type); Type = gsub(" Indiv", "Indiv", Type)
+  Type = gsub(" Subj", "", Type); Type = gsub(" Variable", "", Type)
   Type = as.factor(Type)
 
   n.levs = nlevels(Type)*nlevels(Method)

@@ -127,7 +127,7 @@ perm.jntrank <- function(dat.blocks, signal.ranks = NULL, nperms = 500, perc.var
 #' IndivLd.X =t(ToyDat$Loadings$Indiv_1)
 #' IndivLd.Y = t(ToyDat$Loadings$Indiv_2)
 #'
-#' # Save joint, individual, and noise signal matrices as R oobjects
+#' # Save joint, individual, and noise signal matrices as R objects
 #' JX = ToyDat[[1]]$J1
 #' JY = ToyDat[[1]]$J2
 #' IX = ToyDat[[1]]$I1
