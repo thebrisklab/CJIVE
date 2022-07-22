@@ -33,7 +33,7 @@ perm.jntrank <- function(dat.blocks, signal.ranks = NULL, nperms = 500, perc.var
   }
 
   if(is.null(signal.ranks)){
-    all.singvals = sapply(cent.blocks, function(x) svd(x)$d)
+    all.singvals = lapply(cent.blocks, function(x) svd(x)$d)
     for(k in 1:K){
       d = all.singvals[[k]]
       signal.ranks = c(signal.ranks, which.min(cumsum(d^2) <= perc.var*sum(d^2)) )
