@@ -95,56 +95,56 @@ perm.jntrank <- function(dat.blocks, signal.ranks = NULL, nperms = 500, perc.var
 #'         2) 'sJIVE', i.e. Simple JIVE results, correspond to the AJIVE when all ranks are known; includes the joint and individual signal matrices, concatenated PC scores,
 #'         and the projection matrix used to project each data block onto the joint subspace
 #' @examples
-#' #Assign sample size and the number of features in each dataset
-#' n = 200 #sample size
-#' p1 = 2000 #Number of features in data set X1
-#' p2 = 1000 #Number of features in data set X2
+#'#Assign sample size and the number of features in each dataset
+#'n = 200 #sample size
+#'p1 = 2000 #Number of features in data set X1
+#'p2 = 1000 #Number of features in data set X2
 #'
-#' # Assign values of joint and individual signal ranks
-#' r.J = 1 #joint rank
-#' r.I1 = 2 #individual rank for data set X1
-#' r.I2 = 2 #individual rank for data set X2
-#'
-#'
-#' # Simulate data sets
-#' ToyDat = GenToyDatBinRank(n = 200, p1 = p1, p2 = p2, JntVarEx1 = 0.05, JntVarEx2 = 0.05,
-#'                            IndVarEx1 = 0.25, IndVarEx2 = 0.25, jnt_rank = r.J, equal.eig = FALSE,
-#'                            ind_rank1 = r.I1, ind_rank2 = r.I2, SVD.plots = TRUE, Error = TRUE,
-#'                            print.cor = TRUE)
-#' # Store simulated data sets in an object called 'blocks'
-#' blocks <- ToyDat$'Data Blocks'
-#'
-#' # Save Subject scores as R objects
-#' JntScores = ToyDat[['Scores']][['Joint']]
-#' IndivScore.X = ToyDat[['Scores']][["Indiv_1"]]
-#' IndivScore.Y = ToyDat[['Scores']][["Indiv_2"]]
-#'
-#' # Save joint variable loadings as R objects
-#' JntLd.X = t(ToyDat$Loadings$Joint_1)
-#' JntLd.Y = t(ToyDat$Loadings$Joint_2)
-#'
-#' # Save individual variable loadings as R objects
-#' IndivLd.X =t(ToyDat$Loadings$Indiv_1)
-#' IndivLd.Y = t(ToyDat$Loadings$Indiv_2)
-#'
-#' # Save joint, individual, and noise signal matrices as R objects
-#' JX = ToyDat[[1]]$J1
-#' JY = ToyDat[[1]]$J2
-#' IX = ToyDat[[1]]$I1
-#' IY = ToyDat[[1]]$I2
-#' EX = ToyDat[[1]]$E1
-#' EY = ToyDat[[1]]$E2
+#'# Assign values of joint and individual signal ranks
+#'r.J = 1 #joint rank
+#'r.I1 = 2 #individual rank for data set X1
+#'r.I2 = 2 #individual rank for data set X2
 #'
 #'
-#' ## Check that proportions of variation explained are (approximately) equal to intended values
-#' JVE.X = MatVar(JX)/MatVar(blocks[[1]])
-#' JVE.Y = MatVar(JY)/MatVar(blocks[[2]])
+#'# Simulate data sets
+#'ToyDat = GenToyDatBinRank(n = 200, p1 = p1, p2 = p2, JntVarEx1 = 0.05, JntVarEx2 = 0.05,
+#'                           IndVarEx1 = 0.25, IndVarEx2 = 0.25, jnt_rank = r.J, equal.eig = FALSE,
+#'                           ind_rank1 = r.I1, ind_rank2 = r.I2, SVD.plots = TRUE, Error = TRUE,
+#'                           print.cor = TRUE)
+#'# Store simulated data sets in an object called 'blocks'
+#'blocks <- ToyDat$'Data Blocks'
 #'
-#' IVE.X = MatVar(IX)/MatVar(blocks[[1]])
-#' IVE.Y = MatVar(IY)/MatVar(blocks[[2]])
+#'# Save Subject scores as R objects
+#'JntScores = ToyDat[['Scores']][['Joint']]
+#'IndivScore.X = ToyDat[['Scores']][["Indiv_1"]]
+#'IndivScore.Y = ToyDat[['Scores']][["Indiv_2"]]
 #'
-#' TotVE.X = MatVar((JX + IX))/MatVar(blocks[[1]])
-#' TotVE.Y = MatVar((JY + IY))/MatVar(blocks[[2]])
+#'# Save joint variable loadings as R objects
+#'JntLd.X = t(ToyDat$Loadings$Joint_1)
+#'JntLd.Y = t(ToyDat$Loadings$Joint_2)
+#'
+#'# Save individual variable loadings as R objects
+#'IndivLd.X =t(ToyDat$Loadings$Indiv_1)
+#'IndivLd.Y = t(ToyDat$Loadings$Indiv_2)
+#'
+#'# Save joint, individual, and noise signal matrices as R objects
+#'JX = ToyDat[[1]]$J1
+#'JY = ToyDat[[1]]$J2
+#'IX = ToyDat[[1]]$I1
+#'IY = ToyDat[[1]]$I2
+#'EX = ToyDat[[1]]$E1
+#'EY = ToyDat[[1]]$E2
+#'
+#'
+#'## Check that proportions of variation explained are (approximately) equal to intended values
+#'JVE.X = MatVar(JX)/MatVar(blocks[[1]])
+#'JVE.Y = MatVar(JY)/MatVar(blocks[[2]])
+#'
+#'IVE.X = MatVar(IX)/MatVar(blocks[[1]])
+#'IVE.Y = MatVar(IY)/MatVar(blocks[[2]])
+#'
+#'TotVE.X = MatVar((JX + IX))/MatVar(blocks[[1]])
+#'TotVE.Y = MatVar((JY + IY))/MatVar(blocks[[2]])
 #'
 #'
 #' CJIVE.res = cc.jive(blocks, c(r.I1,r.I2)+r.J, r.J, perm.test = FALSE)

@@ -555,7 +555,7 @@ gg.rank.plot<-function(rank.dat, cols, show.legend = FALSE, text.size, num.sims)
     ggplot2::geom_bar(position = ggplot2::position_dodge(), stat = "identity", width = 0.6, show.legend = show.legend) +
     ggplot2::labs(y = "Proportion", x = "Selected Rank") +
     ggplot2::facet_grid(rank.dat$JVE_2 ~ rank.dat$JVE_1, labeller = ggplot2::label_parsed) +
-    ggplot2::scale_fill_discrete(values=cols,  name = "Method") +
+    ggplot2::scale_fill_manual(values=cols,  name = "Method") +
     ggplot2::theme_bw() +
     ggplot2::theme(text = ggplot2::element_text(size = text.size))
 }
