@@ -96,7 +96,7 @@ perm.jntrank <- function(dat.blocks, signal.ranks = NULL, nperms = 500, perc.var
 #'         and the projection matrix used to project each data block onto the joint subspace
 #' @examples
 #'#Assign sample size and the number of features in each dataset
-#'n = 200 #sample size
+#'n = 400 #sample size
 #'p1 = 2000 #Number of features in data set X1
 #'p2 = 1000 #Number of features in data set X2
 #'
@@ -266,7 +266,57 @@ cc.jive<-function(dat.blocks, signal.ranks = NULL, joint.rank = 1, perc.var = 0.
 #' @param can.cors canonical correlations from the PCs of the data on which CJIVE was initially conducted - notated as rho_j in CJIVE manuscript
 #'
 #' @return matrix of joint subject score for new subjects
+#'
+#' @example
+#'n = 400 #sample size
+#'p1 = 2000 #Number of features in data set X1
+#'p2 = 1000 #Number of features in data set X2
+#'
+#'# Assign values of joint and individual signal ranks
+#'r.J = 1 #joint rank
+#'r.I1 = 2 #individual rank for data set X1
+#'r.I2 = 2 #individual rank for data set X2
+#'true_signal_ranks = r.J + c(r.I1,r.I2)
+#'
+#'# Simulate data sets
+#'ToyDat = GenToyDatBinRank(n = n, p1 = p1, p2 = p2, JntVarEx1 = 0.05, JntVarEx2 = 0.05,
+#'                           IndVarEx1 = 0.25, IndVarEx2 = 0.25, jnt_rank = r.J, equal.eig = FALSE,
+#'                           ind_rank1 = r.I1, ind_rank2 = r.I2, SVD.plots = TRUE, Error = TRUE,
+#'                           print.cor = TRUE)
+#'# Store simulated data sets in an object called 'blocks'
+#'blocks <- ToyDat$'Data Blocks'
+#'
+#'# Split data randomly into two subsamples
+#'rnd.smp = sample(n, n/2)
+#'blocks.sub1 = lapply(blocks, function(x){x[rnd.smp,]})
+#'blocks.sub2 = lapply(blocks, function(x){x[-rnd.smp,]})
+#'
+#'# Joint scores for the two sub samples
+#'JntScores.1 = ToyDat[['Scores']][['Joint']][rnd.smp]
+#'JntScores.2 = ToyDat[['Scores']][['Joint']][-rnd.smp]
+#'
+#'# Conduct CJIVE analysis on the first sub-sample and store the canonical loadings and canonical correlations
+#'cc.jive.res_sub1 = cc.jive(blocks.sub1, signal.ranks = r.J+c(r.I1,r.I2), center = F, perm.test = F, joint.rank = r.J)
+#'cc.ldgs1 = cc.jive.res_sub1$CanCorRes$Loadings
+#'can.cors = cc.jive.res_sub1$CanCorRes$Canonical_Correlations[1:r.J]
+#'
+#'# Conduct CJIVE analysis on the second sub-sample. We will predict these joint scores using the results above
+#'cc.jive.res_sub2 = cc.jive(blocks.sub2, signal.ranks = true_signal_ranks, center = F, perm.test = F, joint.rank = r.J)
+#'cc.jnt.scores.sub2 = cc.jive.res_sub2$CanCorRes$Jnt_Scores
+#'cc.pred.jnt.scores.sub2 = cc.jive.pred(blocks.sub1, new.subjs = blocks.sub2, signal.ranks = true_signal_ranks,
+#'                                   cc.jive.loadings = cc.ldgs1, can.cors = can.cors)
+#'
+#'# Calculate the Pearson correlation coefficient between predicted and calculated joint scores for sub-sample 2
+#'cc.pred.cor = diag(cor(cc.pred.jnt.scores.sub2, cc.jnt.scores.sub2))
+#'
+#'# Plots of CJIVE estimates against true counterparts and include an estimate of their chordal norm
+#'layout(matrix(1:2, ncol = 2))
+#'plot(cc.pred.jnt.scores.sub2, JntScores.2, xlab = "Predicted Joint Scores", ylab = "True Joint Scores")
+#'plot(cc.pred.jnt.scores.sub2, cc.jnt.scores.sub2, xlab = "Predicted Joint Scores", ylab = "Estimated Joint Scores")
+#'layout(1)
+#'
 #' @export
+
 cc.jive.pred<-function(orig.dat.blocks, new.subjs, signal.ranks, cc.jive.loadings, can.cors){
 
   r1 = signal.ranks[1]
