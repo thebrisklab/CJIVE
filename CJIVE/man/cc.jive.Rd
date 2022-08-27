@@ -44,7 +44,7 @@ Performs Canonical JIVE as described in the CJVE manuscript. This method is equi
 }
 \examples{
 #Assign sample size and the number of features in each dataset
-n = 200 #sample size
+n = 400 #sample size
 p1 = 2000 #Number of features in data set X1
 p2 = 1000 #Number of features in data set X2
 
@@ -56,9 +56,9 @@ r.I2 = 2 #individual rank for data set X2
 
 # Simulate data sets
 ToyDat = GenToyDatBinRank(n = 200, p1 = p1, p2 = p2, JntVarEx1 = 0.05, JntVarEx2 = 0.05,
-                           IndVarEx1 = 0.25, IndVarEx2 = 0.25, jnt_rank = r.J, equal.eig = FALSE,
-                           ind_rank1 = r.I1, ind_rank2 = r.I2, SVD.plots = TRUE, Error = TRUE,
-                           print.cor = TRUE)
+                          IndVarEx1 = 0.25, IndVarEx2 = 0.25, jnt_rank = r.J, equal.eig = FALSE,
+                          ind_rank1 = r.I1, ind_rank2 = r.I2, SVD.plots = TRUE, Error = TRUE,
+                          print.cor = TRUE)
 # Store simulated data sets in an object called 'blocks'
 blocks <- ToyDat$'Data Blocks'
 
