@@ -18,7 +18,7 @@ Must have the same number of rows as each matrix in 'blocks' and number of colum
 returned. Default is NULL.}
 }
 \value{
-list of 4 items: 1) joint signal matrices, their SVDs, and the proportion of total variation in each matrix that is attributable to the joint signal
+list of 4 or 5 items: 1) joint signal matrices, their SVDs, and the proportion of total variation in each matrix that is attributable to the joint signal
                          2) individual signal matrices, their SVDs, and the proportion of total variation in each matrix that is attributable to the individual signal
                          3) concatenated PC scores, used to determine joint subspace
                          4) projection matrix for joint subspace

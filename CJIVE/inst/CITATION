@@ -1,0 +1,25 @@
+citHeader("To cite CJIVE in publications use:")
+
+citEntry(
+  entry    = "Article",
+         title = "Interpretive JIVE: Connections with CCA and an application to brain connectivity",
+         author = c(person(c("Raphiel", "J."), "Murden"),
+                    person(c("Zhengwu"), "Zhang"),
+                    person(c("Ying"), "Guo"),
+                    person(c("Benjamin", "B."), "Risk")),
+         year = "2022", publisher = "Frontiers", address = "London",
+         journal = "Fronteirs in Neuroscience", volume = "16",
+         doi = "10.3389/fnins.2022.969510",
+         url      = "https://doi.org/10.3389/fnins.2022.969510",
+         textVersion = "Murden, R., Zhang, Z., Guo, Y., & Risk, B. Interpretive JIVE: Connections with CCA and an Application to Brain Connectivity. Frontiers in Neuroscience, 1771.")
+
+bibentry(bibtype = "Article",
+         title = "Interpretive JIVE: Connections with CCA and an application to brain connectivity",
+         author = c(person(c("Raphiel", "J."), "Murden"),
+                    person(c("Zhengwu"), "Zhang"),
+                    person(c("Ying"), "Guo"),
+                    person(c("Benjamin", "B."), "Risk")),
+         year = "2022", publisher = "Frontiers", address = "London",
+         journal = "Fronteirs in Neuroscience", volume = "16",
+         doi = "10.3389/fnins.2022.969510",
+         textVersion = "Murden, R., Zhang, Z., Guo, Y., & Risk, B. Interpretive JIVE: Connections with CCA and an Application to Brain Connectivity. Frontiers in Neuroscience, 1771.")

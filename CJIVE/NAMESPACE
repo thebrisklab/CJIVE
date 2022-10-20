@@ -2,7 +2,7 @@
 
 export(AdjSigVarExp)
 export(ConvSims_gg)
-export(GenToyDatBinRank)
+export(GenerateToyData)
 export(GetSimResults_Dir)
 export(MatVar)
 export(MatVar2)
