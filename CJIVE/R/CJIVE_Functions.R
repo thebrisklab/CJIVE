@@ -10,9 +10,10 @@
 #' @param signal.ranks a vector of length two which contains the rank for the signal within each data block. The rank corresponds to the number of principal
 #'                     components (PCs) to be retained within each data block. If NULL, the ranks are determined by the parameter 'perc.var.' Default is NULL
 #' @param nperms integer value indicating the number of permutations that should be performed
-#' @param perc.var an alternative to signal.ranks that allows specification of ranks based on the desired proportion of total variation to be retained. F
+#' @param perc.var numeric value of either a scalar or of length 2: an alternative to signal.ranks that allows specification of signal ranks based on the
+#'                 desired proportion of total variation to be retained in each data block.
 #'                 For perc.var = p (where 0<p<1), rank is determined as the minimum number of eigenvalues whose cumulative sum is at least p*(total sum of eigenvalues).
-#'                 Default is 0.95 (i.e. 95\% of total variation preserved for each data block)
+#'                 Default is 0.95 (i.e. 95\% of total variation preserved for each data block). For p=c(p1,p2) pk is used to determine the rank of block k
 #' @param alpha nominal type-I error rate
 #' @param center logical (TRUE/FALSE) indicating whether data should be column-centered prior to testing. Default is TRUE
 #' @return The Frobenius norm of the matrix X, calculated as the sum of square entries in X
@@ -34,9 +35,10 @@ perm.jntrank <- function(dat.blocks, signal.ranks = NULL, nperms = 500, perc.var
 
   if(is.null(signal.ranks)){
     all.singvals = lapply(cent.blocks, function(x) svd(x)$d)
+    p = ifelse(length(perc.var)==1, rep(perc.var, 2), perc.var)
     for(k in 1:K){
       d = all.singvals[[k]]
-      signal.ranks = c(signal.ranks, which.min(cumsum(d^2) <= perc.var*sum(d^2)) )
+      signal.ranks = c(signal.ranks, which.min(cumsum(d^2) <= p[k]*sum(d^2)) )
     }
   }
 
@@ -107,7 +109,7 @@ perm.jntrank <- function(dat.blocks, signal.ranks = NULL, nperms = 500, perc.var
 #'
 #'
 #'# Simulate data sets
-#'ToyDat = GenToyDatBinRank(n = 200, p1 = p1, p2 = p2, JntVarEx1 = 0.05, JntVarEx2 = 0.05,
+#'ToyDat = GenerateToyData(n = 200, p1 = p1, p2 = p2, JntVarEx1 = 0.05, JntVarEx2 = 0.05,
 #'                           IndVarEx1 = 0.25, IndVarEx2 = 0.25, jnt_rank = r.J, equal.eig = FALSE,
 #'                           ind_rank1 = r.I1, ind_rank2 = r.I2, SVD.plots = TRUE, Error = TRUE,
 #'                           print.cor = TRUE)
@@ -279,7 +281,7 @@ cc.jive<-function(dat.blocks, signal.ranks = NULL, joint.rank = 1, perc.var = 0.
 #'true_signal_ranks = r.J + c(r.I1,r.I2)
 #'
 #'# Simulate data sets
-#'ToyDat = GenToyDatBinRank(n = n, p1 = p1, p2 = p2, JntVarEx1 = 0.05, JntVarEx2 = 0.05,
+#'ToyDat = GenerateToyData(n = n, p1 = p1, p2 = p2, JntVarEx1 = 0.05, JntVarEx2 = 0.05,
 #'                           IndVarEx1 = 0.25, IndVarEx2 = 0.25, jnt_rank = r.J, equal.eig = FALSE,
 #'                           ind_rank1 = r.I1, ind_rank2 = r.I2, SVD.plots = TRUE, Error = TRUE,
 #'                           print.cor = TRUE)
@@ -304,15 +306,21 @@ cc.jive<-function(dat.blocks, signal.ranks = NULL, joint.rank = 1, perc.var = 0.
 #'cc.jive.res_sub2 = cc.jive(blocks.sub2, signal.ranks = true_signal_ranks, center = F, perm.test = F, joint.rank = r.J)
 #'cc.jnt.scores.sub2 = cc.jive.res_sub2$CanCorRes$Jnt_Scores
 #'cc.pred.jnt.scores.sub2 = cc.jive.pred(blocks.sub1, new.subjs = blocks.sub2, signal.ranks = true_signal_ranks,
-#'                                   cc.jive.loadings = cc.ldgs1, can.cors = can.cors)
+#'                                       cc.jive.loadings = cc.ldgs1, can.cors = can.cors)
 #'
 #'# Calculate the Pearson correlation coefficient between predicted and calculated joint scores for sub-sample 2
 #'cc.pred.cor = diag(cor(cc.pred.jnt.scores.sub2, cc.jnt.scores.sub2))
+#'print(cc.pred.cor)
 #'
 #'# Plots of CJIVE estimates against true counterparts and include an estimate of their chordal norm
 #'layout(matrix(1:2, ncol = 2))
-#'plot(cc.pred.jnt.scores.sub2, JntScores.2, xlab = "Predicted Joint Scores", ylab = "True Joint Scores")
-#'plot(cc.pred.jnt.scores.sub2, cc.jnt.scores.sub2, xlab = "Predicted Joint Scores", ylab = "Estimated Joint Scores")
+#'plot(JntScores.2, cc.pred.jnt.scores.sub2, ylab = "Predicted Joint Scores", xlab = "True Joint Scores",
+#'     col = rep(cols, each = n/2),
+#'     main = paste("Chordal Norm = ", round(chord.norm.diff(JntScores.2, cc.pred.jnt.scores.sub2),2)))
+#'legend("topleft", legend = paste("Component", 1:3), col = cols, pch = 1)
+#'plot(cc.jnt.scores.sub2, cc.pred.jnt.scores.sub2, ylab = "Predicted Joint Scores", xlab = "Estimated Joint Scores",
+#'     col = rep(cols, each = n/2),
+#'     main = paste("Chordal Norm = ", round(chord.norm.diff(cc.jnt.scores.sub2, cc.pred.jnt.scores.sub2),2)))
 #'layout(1)
 #'
 #' @export
@@ -346,7 +354,7 @@ cc.jive.pred<-function(orig.dat.blocks, new.subjs, signal.ranks, cc.jive.loading
 #'                     Must have the same number of rows as each matrix in 'blocks' and number of columns equal to 'joint_rank'. If NULL, joint scores are calculated and
 #'                     returned. Default is NULL.
 #'
-#' @return list of 4 items: 1) joint signal matrices, their SVDs, and the proportion of total variation in each matrix that is attributable to the joint signal
+#' @return list of 4 or 5 items: 1) joint signal matrices, their SVDs, and the proportion of total variation in each matrix that is attributable to the joint signal
 #'                          2) individual signal matrices, their SVDs, and the proportion of total variation in each matrix that is attributable to the individual signal
 #'                          3) concatenated PC scores, used to determine joint subspace
 #'                          4) projection matrix for joint subspace

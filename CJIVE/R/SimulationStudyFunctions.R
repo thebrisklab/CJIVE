@@ -21,7 +21,7 @@
 #'         and error matrices for each data set; 2) list of simulated data sets (each equal to the sum of the matrices in part 1);
 #'         3) list of joint subject scores and individual subject scores for each data set, and 4) lsit of joint and individual loadings for each data set
 #' @examples
-#' ToyDat = GenToyDatBinRank(n = 200, p1 = 2000, p2 = 1000, JntVarEx1 = 0.05, JntVarEx2 = 0.05,
+#' ToyDat = GenerateToyData(n = 200, p1 = 2000, p2 = 1000, JntVarEx1 = 0.05, JntVarEx2 = 0.05,
 #'                            IndVarEx1 = 0.25, IndVarEx2 = 0.25, jnt_rank = 1, equal.eig = FALSE,
 #'                            ind_rank1 = 2, ind_rank2 = 3, SVD.plots = TRUE, Error = TRUE,
 #'                            print.cor = TRUE)
@@ -29,7 +29,7 @@
 #'
 #'
 
-GenToyDatBinRank <- function(n, p1, p2, JntVarEx1, JntVarEx2, IndVarEx1, IndVarEx2, jnt_rank = 1, equal.eig = FALSE, ind_rank1 = 2, ind_rank2 = 2,
+GenerateToyData <- function(n, p1, p2, JntVarEx1, JntVarEx2, IndVarEx1, IndVarEx2, jnt_rank = 1, equal.eig = FALSE, ind_rank1 = 2, ind_rank2 = 2,
                              SVD.plots = TRUE, Error = TRUE, print.cor = TRUE){
 
   #Write out both joint and indiv subject scores for both data sets first
