@@ -55,7 +55,7 @@ r.I2 = 2 #individual rank for data set X2
 
 
 # Simulate data sets
-ToyDat = GenToyDatBinRank(n = 200, p1 = p1, p2 = p2, JntVarEx1 = 0.05, JntVarEx2 = 0.05,
+ToyDat = GenerateToyData(n = 200, p1 = p1, p2 = p2, JntVarEx1 = 0.05, JntVarEx2 = 0.05,
                           IndVarEx1 = 0.25, IndVarEx2 = 0.25, jnt_rank = r.J, equal.eig = FALSE,
                           ind_rank1 = r.I1, ind_rank2 = r.I2, SVD.plots = TRUE, Error = TRUE,
                           print.cor = TRUE)

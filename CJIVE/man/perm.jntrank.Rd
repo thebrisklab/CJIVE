@@ -21,9 +21,10 @@ components (PCs) to be retained within each data block. If NULL, the ranks are d
 
 \item{nperms}{integer value indicating the number of permutations that should be performed}
 
-\item{perc.var}{an alternative to signal.ranks that allows specification of ranks based on the desired proportion of total variation to be retained. F
+\item{perc.var}{numeric value of either a scalar or of length 2: an alternative to signal.ranks that allows specification of signal ranks based on the
+desired proportion of total variation to be retained in each data block.
 For perc.var = p (where 0<p<1), rank is determined as the minimum number of eigenvalues whose cumulative sum is at least p*(total sum of eigenvalues).
-Default is 0.95 (i.e. 95\% of total variation preserved for each data block)}
+Default is 0.95 (i.e. 95\% of total variation preserved for each data block). For p=c(p1,p2) pk is used to determine the rank of block k}
 
 \item{alpha}{nominal type-I error rate}
 
