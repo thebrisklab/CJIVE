@@ -2,7 +2,7 @@
 % Please edit documentation in R/Utilities.R
 \name{show.image.2}
 \alias{show.image.2}
-\title{Display a heatmap of a matrix (adapted from Erick Lock's show.image funciton in the r.jive package)}
+\title{Display a heatmap of a matrix (adapted from Erick Lock's show.image function in the r.jive package)}
 \usage{
 show.image.2(
   Image,
