@@ -109,7 +109,7 @@ vec2net.l = function(invector) {
 }
 
 ############    Visually display heatmap of matrix: adapted from Erick Lock's show.image function employed in r.jive package   ###################
-#' Display a heatmap of a matrix (adapted from Erick Lock's show.image funciton in the r.jive package)
+#' Display a heatmap of a matrix (adapted from Erick Lock's show.image function in the r.jive package)
 #'
 #' @description Visual display of a matrix as a heatmap with colors determined by entry values, and including a colorbar to aid interpretation of the heatmap
 #'
