@@ -3,7 +3,7 @@ Type: Package
 Title: Canonical Joint and Individual Variation Explained (CJIVE)
 Version: 0.1.0
 Authors@R: c(person("Raphiel", "Murden", email = "rmurden@emory.edu",role = c("aut", "cre"),comment = c(ORCID = "0000-0002-6396-9105")),person("Benjamin", "Risk", email = "brisk@emory.edu",role = "aut"))
-Maintainer: The package maintainer Raphiel Murden <rmurden@emory.edu>
+Maintainer: Raphiel Murden <rmurden@emory.edu>
 Description: Joint and Individual Variation Explained (JIVE) is a method for decomposing multiple datasets obtained on the same subjects into
 		shared structure, structure unique to each dataset, and noise. The two most common implementations are R.JIVE, an iterative
 		approach, and AJIVE, which uses principal angle analysis. JIVE estimates subspaces but interpreting these subspaces can be
