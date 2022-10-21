@@ -11,7 +11,6 @@ Description: Joint and Individual Variation Explained (JIVE) is a method for dec
 		scores. This reformulation, which we call CJIVE, 1) provides an ordering of joint components by the degree of correlation between
 		corresponding canonical variables; 2) uses a computationally efficient permutation test for the number of joint components, which
 		provides a p-value for each component; and 3) can be used to predict subject scores for out-of-sample observations.
-		
 		Please cite the following article when utilizing this package:
 		Murden, R., Zhang, Z., Guo, Y., & Risk, B. Interpretive JIVE: Connections with CCA and an Application to Brain Connectivity. 
 		Frontiers in Neuroscience, 1771.
