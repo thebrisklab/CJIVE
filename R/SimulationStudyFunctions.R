@@ -45,8 +45,7 @@ GenerateToyData <- function(n, p1, p2, JntVarEx1, JntVarEx2, IndVarEx1, IndVarEx
   IndivScores = matrix(b, nrow = n, ncol = (r.I1 + r.I2))
   colnames(IndivScores) = c(paste("Ind X Score", 1:r.I1), paste("Ind Y Score", 1:r.I2))
 
-  if(print.cor){print("The correlation between subject scores is given by")
-    print(round(stats::cor(cbind(JntScores, IndivScores)),4))}
+  if(print.cor){message("The correlation between subject scores is given by", round(stats::cor(cbind(JntScores, IndivScores)),4))}
 
   ##############################Define X Dataset##############################
   ##Then write each of the 3 variable loading vectors for the first dataset

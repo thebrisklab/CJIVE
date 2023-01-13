@@ -298,12 +298,12 @@ cc.jive<-function(dat.blocks, signal.ranks = NULL, joint.rank = 1, perc.var = 0.
 #'JntScores.2 = ToyDat[['Scores']][['Joint']][-rnd.smp]
 #'
 #'# Conduct CJIVE analysis on the first sub-sample and store the canonical loadings and canonical correlations
-#'cc.jive.res_sub1 = cc.jive(blocks.sub1, signal.ranks = r.J+c(r.I1,r.I2), center = F, perm.test = F, joint.rank = r.J)
+#'cc.jive.res_sub1 = cc.jive(blocks.sub1, signal.ranks = r.J+c(r.I1,r.I2), center = FALSE, perm.test = FALSE, joint.rank = r.J)
 #'cc.ldgs1 = cc.jive.res_sub1$CanCorRes$Loadings
 #'can.cors = cc.jive.res_sub1$CanCorRes$Canonical_Correlations[1:r.J]
 #'
 #'# Conduct CJIVE analysis on the second sub-sample. We will predict these joint scores using the results above
-#'cc.jive.res_sub2 = cc.jive(blocks.sub2, signal.ranks = true_signal_ranks, center = F, perm.test = F, joint.rank = r.J)
+#'cc.jive.res_sub2 = cc.jive(blocks.sub2, signal.ranks = true_signal_ranks, center = FALSE, perm.test = FALSE, joint.rank = r.J)
 #'cc.jnt.scores.sub2 = cc.jive.res_sub2$CanCorRes$Jnt_Scores
 #'cc.pred.jnt.scores.sub2 = cc.jive.pred(blocks.sub1, new.subjs = blocks.sub2, signal.ranks = true_signal_ranks,
 #'                                       cc.jive.loadings = cc.ldgs1, can.cors = can.cors)
