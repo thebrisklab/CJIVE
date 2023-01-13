@@ -17,8 +17,8 @@ Description: Joint and Individual Variation Explained (JIVE) is a method for dec
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-Imports: rootSolve, Matrix, ggplot2, reshape2, fields, mvtnorm, dplyr, xtable, optimx, MASS, extraDistr, gplots, psych
-RoxygenNote: 7.1.2
+Imports: rootSolve, ggplot2, reshape2, fields, gplots, psych
+RoxygenNote: 7.2.3
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
