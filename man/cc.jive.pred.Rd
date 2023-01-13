@@ -31,6 +31,7 @@ matrix of joint subject score for new subjects
 Predicts joint scores for new subjects based on CJIVE joint scores
 }
 \examples{
+<<<<<<< HEAD
 n = 200 #sample size
 p1 = 200 #Number of features in data set X1
 p2 = 100 #Number of features in data set X2
