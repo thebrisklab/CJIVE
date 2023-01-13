@@ -123,7 +123,7 @@ vec2net.l = function(invector) {
 #'
 #' @return graphical display of matrix as a heatmap
 #' @export
-show.image.2<-function (Image, ylab = "", xlab="",net=F, main="", sub="", colorbar = TRUE)
+show.image.2<-function (Image, ylab = "", xlab="", net=FALSE, main="", sub="", colorbar = TRUE)
 {
   #if(net){Image=Image-diag(Image)}
 

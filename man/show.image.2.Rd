@@ -8,7 +8,7 @@ show.image.2(
   Image,
   ylab = "",
   xlab = "",
-  net = F,
+  net = FALSE,
   main = "",
   sub = "",
   colorbar = TRUE

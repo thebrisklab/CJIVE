@@ -1,6 +1,6 @@
 Package: CJIVE
 Type: Package
-Title: Canonical Joint and Individual Variation Explained (CJIVE)
+Title: "Canonical Joint and Individual Variation Explained (CJIVE)"
 Version: 0.1.0
 Authors@R: c(person("Raphiel", "Murden", email = "rmurden@emory.edu",role = c("aut", "cre"),comment = c(ORCID = "0000-0002-6396-9105")),person("Benjamin", "Risk", email = "brisk@emory.edu",role = "aut"))
 Maintainer: Raphiel Murden <rmurden@emory.edu>
@@ -11,9 +11,8 @@ Description: Joint and Individual Variation Explained (JIVE) is a method for dec
 		scores. This reformulation, which we call CJIVE, 1) provides an ordering of joint components by the degree of correlation between
 		corresponding canonical variables; 2) uses a computationally efficient permutation test for the number of joint components, which
 		provides a p-value for each component; and 3) can be used to predict subject scores for out-of-sample observations.
-		Please cite the following article when utilizing this package:
-		Murden, R., Zhang, Z., Guo, Y., & Risk, B. Interpretive JIVE: Connections with CCA and an Application to Brain Connectivity. 
-		Frontiers in Neuroscience, 1771.
+		Please cite the following article when utilizing this package: 
+		Murden, R., Zhang, Z., Guo, Y., & Risk, B. (2022) <doi:10.3389/fnins.2022.969510>.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
