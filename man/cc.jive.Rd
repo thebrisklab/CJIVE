@@ -44,9 +44,9 @@ Performs Canonical JIVE as described in the CJVE manuscript. This method is equi
 }
 \examples{
 #Assign sample size and the number of features in each dataset
-n = 400 #sample size
-p1 = 2000 #Number of features in data set X1
-p2 = 1000 #Number of features in data set X2
+n = 200 #sample size
+p1 = 100 #Number of features in data set X1
+p2 = 100 #Number of features in data set X2
 
 # Assign values of joint and individual signal ranks
 r.J = 1 #joint rank

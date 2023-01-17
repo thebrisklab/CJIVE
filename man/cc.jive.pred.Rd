@@ -31,12 +31,8 @@ matrix of joint subject score for new subjects
 Predicts joint scores for new subjects based on CJIVE joint scores
 }
 \examples{
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 1677dc55cd9779d295c0ed1905919bf426476917
 n = 200 #sample size
-p1 = 200 #Number of features in data set X1
+p1 = 100 #Number of features in data set X1
 p2 = 100 #Number of features in data set X2
 # Assign values of joint and individual signal ranks
 r.J = 1 #joint rank
